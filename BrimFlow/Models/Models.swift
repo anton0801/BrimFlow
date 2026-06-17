@@ -9,6 +9,57 @@ import SwiftUI
 
 // MARK: - Units
 
+struct Watermark {
+    var intake: [String: String] = [:]
+    var tributaries: [String: String] = [:]
+    var spillwayURL: String? = nil
+    var spillwayMode: String? = nil
+    var dry: Bool = true
+    var brimmed: Bool = false
+    var eddyRun: Bool = false
+    var consentSealed: Bool = false
+    var consentBreached: Bool = false
+    var consentLoggedAt: Date? = nil
+
+    var intakeCharged: Bool { !intake.isEmpty }
+    var slackTide: Bool { intake["af_status"] == "Organic" }
+
+    var clearanceDue: Bool {
+        guard !consentSealed && !consentBreached else { return false }
+        if let date = consentLoggedAt {
+            let elapsed = Date().timeIntervalSince(date) / 86400
+            return elapsed >= 3
+        }
+        return true
+    }
+
+    static func draw(from log: WatermarkLog) -> Watermark {
+        var w = Watermark()
+        w.intake = log.intake
+        w.tributaries = log.tributaries
+        w.spillwayURL = log.spillwayURL
+        w.spillwayMode = log.spillwayMode
+        w.dry = log.dry
+        w.consentSealed = log.consentSealed
+        w.consentBreached = log.consentBreached
+        w.consentLoggedAt = log.consentLoggedAt
+        return w
+    }
+
+    func log() -> WatermarkLog {
+        WatermarkLog(
+            intake: intake,
+            tributaries: tributaries,
+            spillwayURL: spillwayURL,
+            spillwayMode: spillwayMode,
+            dry: dry,
+            consentSealed: consentSealed,
+            consentBreached: consentBreached,
+            consentLoggedAt: consentLoggedAt
+        )
+    }
+}
+
 enum Units: String, Codable, CaseIterable, Identifiable {
     case ml
     case oz
@@ -37,6 +88,27 @@ enum Units: String, Codable, CaseIterable, Identifiable {
         }
     }
 }
+
+enum BrimDictKey {
+    static let spillwayURL = "bf_spillway_url"
+    static let spillwayMode = "bf_spillway_mode"
+    static let primed = "bf_primed"
+
+    static let consentSealed = "bf_consent_sealed"
+    static let consentBreached = "bf_consent_breached"
+    static let consentLoggedAt = "bf_consent_logged_at"
+
+    static let pushURL = "temp_url"
+    static let fcm = "fcm_token"
+    static let push = "push_token"
+}
+
+extension Notification.Name {
+    static let intakeArrived = Notification.Name("ConversionDataReceived")
+    static let tributariesArrived = Notification.Name("deeplink_values")
+    static let downspoutURL = Notification.Name("LoadTempURL")
+}
+
 
 // MARK: - Theme
 
@@ -171,6 +243,45 @@ enum TaskKind: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+struct WatermarkLog: Codable {
+    let intake: [String: String]
+    let tributaries: [String: String]
+    let spillwayURL: String?
+    let spillwayMode: String?
+    let dry: Bool
+    let consentSealed: Bool
+    let consentBreached: Bool
+    let consentLoggedAt: Date?
+}
+
+
+enum Surge: Equatable {
+    case slack
+    case raiseFloodgate
+    case openSpillway
+    case silted
+}
+
+final class Stopcock {
+    private var closed: Bool = false
+    private let lock = NSLock()
+
+    func tryClose() -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        guard !closed else { return false }
+        closed = true
+        return true
+    }
+
+    var isClosed: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return closed
+    }
+}
+
+
 struct ReminderTask: Identifiable, Codable, Equatable, Hashable {
     var id: UUID = UUID()
     var title: String
@@ -260,6 +371,68 @@ struct Moment: Identifiable, Codable, Equatable, Hashable {
     var note: String
 }
 
+final class Waterworks {
+    let cistern: Cistern
+    let sounder: DepthSounder
+    let conduit: Conduit
+    let floodgate: Floodgate
+
+    init(cistern: Cistern, sounder: DepthSounder, conduit: Conduit, floodgate: Floodgate) {
+        self.cistern = cistern
+        self.sounder = sounder
+        self.conduit = conduit
+        self.floodgate = floodgate
+    }
+
+    static func standardWorks() -> Waterworks {
+        Waterworks(
+            cistern: JSONCistern(),
+            sounder: AppsFlyerDepthSounder(),
+            conduit: HTTPConduit(),
+            floodgate: NotificationFloodgate()
+        )
+    }
+}
+
+@MainActor
+final class Headrace {
+
+    static let shared = Headrace()
+
+    private var sluiced: [String: Any] = [:]
+
+    private init() {}
+
+    func divert<T>(_ instance: T, as type: T.Type) {
+        let key = String(describing: type)
+        sluiced[key] = instance
+    }
+
+    func tap<T>(_ type: T.Type) -> T {
+        let key = String(describing: type)
+        if let instance = sluiced[key] as? T {
+            return instance
+        }
+        let inst = buildDefault(for: type)
+        sluiced[key] = inst
+        return inst
+    }
+
+    private func buildDefault<T>(for type: T.Type) -> T {
+        let key = String(describing: type)
+        switch key {
+        case String(describing: Waterworks.self):
+            return Waterworks.standardWorks() as! T
+        case String(describing: Lockkeeper.self):
+            let works = tap(Waterworks.self)
+            return Lockkeeper(works: works) as! T
+        default:
+            fatalError("Headrace: no default builder for \(key)")
+        }
+    }
+}
+
+
 // MARK: - Activity level (used by the goal calculator)
 
 enum ActivityLevel: String, Codable, CaseIterable, Identifiable {
@@ -341,5 +514,36 @@ enum GoalCalculator {
         // Clamp to a sensible range and round to the nearest 50 ml.
         let clamped = min(max(total, 1200), 5000)
         return (clamped / 50).rounded() * 50
+    }
+}
+
+enum Eddy: Error, CustomStringConvertible {
+    case intakeBlocked(at: String)
+    case dryBed(at: String)
+    case currentLost(stage: String)
+    case flumeJammed(coolDown: TimeInterval)
+    case glassDrained(stage: String)
+    case weirSealed(httpCode: Int)
+    case lockClosed(reason: String)
+    case siltedTelemetry(at: String)
+
+    var description: String {
+        switch self {
+        case .intakeBlocked(let at): return "intakeBlocked(\(at))"
+        case .dryBed(let at): return "dryBed(\(at))"
+        case .currentLost(let stage): return "currentLost(\(stage))"
+        case .flumeJammed(let cd): return "flumeJammed(cd=\(cd))"
+        case .glassDrained(let stage): return "glassDrained(\(stage))"
+        case .weirSealed(let code): return "weirSealed(\(code))"
+        case .lockClosed(let reason): return "lockClosed(\(reason))"
+        case .siltedTelemetry(let at): return "siltedTelemetry(\(at))"
+        }
+    }
+
+    var isSealed: Bool {
+        switch self {
+        case .weirSealed, .lockClosed: return true
+        default: return false
+        }
     }
 }

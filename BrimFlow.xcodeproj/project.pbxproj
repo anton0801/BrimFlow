@@ -7,11 +7,40 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8F06685A2FE2E1AD0001BC46 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8F0668592FE2E1AD0001BC46 /* FirebaseMessaging */; };
+		8F06685D2FE2E1BA0001BC46 /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 8F06685C2FE2E1BA0001BC46 /* AppsFlyerLib */; };
+		8F0668832FE2EA740001BC46 /* PushService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8F06687C2FE2EA740001BC46 /* PushService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8F06688B2FE2EA800001BC46 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8F06688A2FE2EA800001BC46 /* FirebaseMessaging */; };
 		8F58E9432FDB1D3E0063055E /* codemagic.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 8F58E9422FDB1D3E0063055E /* codemagic.yaml */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8F0668812FE2EA740001BC46 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8F059C142FD84C7B008C7797 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8F06687B2FE2EA740001BC46;
+			remoteInfo = PushService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8F0668882FE2EA740001BC46 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8F0668832FE2EA740001BC46 /* PushService.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		8F059C1C2FD84C7B008C7797 /* BrimFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrimFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8F06687C2FE2EA740001BC46 /* PushService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PushService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F58E9422FDB1D3E0063055E /* codemagic.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = codemagic.yaml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -22,6 +51,13 @@
 				Info.plist,
 			);
 			target = 8F059C1B2FD84C7B008C7797 /* BrimFlow */;
+		};
+		8F0668872FE2EA740001BC46 /* Exceptions for "PushService" folder in "PushService" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8F06687B2FE2EA740001BC46 /* PushService */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -34,6 +70,14 @@
 			path = BrimFlow;
 			sourceTree = "<group>";
 		};
+		8F06687D2FE2EA740001BC46 /* PushService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8F0668872FE2EA740001BC46 /* Exceptions for "PushService" folder in "PushService" target */,
+			);
+			path = PushService;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +85,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8F06685A2FE2E1AD0001BC46 /* FirebaseMessaging in Frameworks */,
+				8F06685D2FE2E1BA0001BC46 /* AppsFlyerLib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8F0668792FE2EA740001BC46 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8F06688B2FE2EA800001BC46 /* FirebaseMessaging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,6 +106,8 @@
 			children = (
 				8F58E9422FDB1D3E0063055E /* codemagic.yaml */,
 				8F059C1E2FD84C7B008C7797 /* BrimFlow */,
+				8F06687D2FE2EA740001BC46 /* PushService */,
+				8F0668892FE2EA800001BC46 /* Frameworks */,
 				8F059C1D2FD84C7B008C7797 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,8 +116,16 @@
 			isa = PBXGroup;
 			children = (
 				8F059C1C2FD84C7B008C7797 /* BrimFlow.app */,
+				8F06687C2FE2EA740001BC46 /* PushService.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8F0668892FE2EA800001BC46 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,20 +138,47 @@
 				8F059C182FD84C7B008C7797 /* Sources */,
 				8F059C192FD84C7B008C7797 /* Frameworks */,
 				8F059C1A2FD84C7B008C7797 /* Resources */,
+				8F0668882FE2EA740001BC46 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8F0668822FE2EA740001BC46 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				8F059C1E2FD84C7B008C7797 /* BrimFlow */,
 			);
 			name = BrimFlow;
 			packageProductDependencies = (
+				8F0668592FE2E1AD0001BC46 /* FirebaseMessaging */,
+				8F06685C2FE2E1BA0001BC46 /* AppsFlyerLib */,
 			);
 			productName = BrimFlow;
 			productReference = 8F059C1C2FD84C7B008C7797 /* BrimFlow.app */;
 			productType = "com.apple.product-type.application";
+		};
+		8F06687B2FE2EA740001BC46 /* PushService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8F0668842FE2EA740001BC46 /* Build configuration list for PBXNativeTarget "PushService" */;
+			buildPhases = (
+				8F0668782FE2EA740001BC46 /* Sources */,
+				8F0668792FE2EA740001BC46 /* Frameworks */,
+				8F06687A2FE2EA740001BC46 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8F06687D2FE2EA740001BC46 /* PushService */,
+			);
+			name = PushService;
+			packageProductDependencies = (
+				8F06688A2FE2EA800001BC46 /* FirebaseMessaging */,
+			);
+			productName = PushService;
+			productReference = 8F06687C2FE2EA740001BC46 /* PushService.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -102,6 +193,9 @@
 					8F059C1B2FD84C7B008C7797 = {
 						CreatedOnToolsVersion = 16.4;
 					};
+					8F06687B2FE2EA740001BC46 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
 			buildConfigurationList = 8F059C172FD84C7B008C7797 /* Build configuration list for PBXProject "BrimFlow" */;
@@ -113,12 +207,17 @@
 			);
 			mainGroup = 8F059C132FD84C7B008C7797;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8F0668582FE2E1AD0001BC46 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8F06685B2FE2E1BA0001BC46 /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8F059C1D2FD84C7B008C7797 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				8F059C1B2FD84C7B008C7797 /* BrimFlow */,
+				8F06687B2FE2EA740001BC46 /* PushService */,
 			);
 		};
 /* End PBXProject section */
@@ -132,6 +231,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8F06687A2FE2EA740001BC46 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -142,7 +248,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8F0668782FE2EA740001BC46 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8F0668822FE2EA740001BC46 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8F06687B2FE2EA740001BC46 /* PushService */;
+			targetProxy = 8F0668812FE2EA740001BC46 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		8F059C262FD84C7C008C7797 /* Debug */ = {
@@ -272,6 +393,7 @@
 				INFOPLIST_FILE = BrimFlow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Brim Flow";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow to use your camera in application to use all functionalty of app";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Brim Flow uses tracking data to improve app performance, enhance the user experience, understand how features are used, and support ongoing updates and optimization. This information also helps maintain app reliability, stability, and security.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -286,7 +408,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.flowsinbrims.BrimFlow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -313,6 +435,7 @@
 				INFOPLIST_FILE = BrimFlow/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Brim Flow";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Allow to use your camera in application to use all functionalty of app";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Brim Flow uses tracking data to improve app performance, enhance the user experience, understand how features are used, and support ongoing updates and optimization. This information also helps maintain app reliability, stability, and security.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -327,7 +450,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.flowsinbrims.BrimFlow;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -338,6 +461,67 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
+			};
+			name = Release;
+		};
+		8F0668852FE2EA740001BC46 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PushService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PushService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flowsinbrims.BrimFlow.PushService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8F0668862FE2EA740001BC46 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PushService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PushService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.flowsinbrims.BrimFlow.PushService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -362,7 +546,53 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		8F0668842FE2EA740001BC46 /* Build configuration list for PBXNativeTarget "PushService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8F0668852FE2EA740001BC46 /* Debug */,
+				8F0668862FE2EA740001BC46 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8F0668582FE2E1AD0001BC46 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.15.0;
+			};
+		};
+		8F06685B2FE2E1BA0001BC46 /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.18.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8F0668592FE2E1AD0001BC46 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F0668582FE2E1AD0001BC46 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		8F06685C2FE2E1BA0001BC46 /* AppsFlyerLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F06685B2FE2E1BA0001BC46 /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */;
+			productName = AppsFlyerLib;
+		};
+		8F06688A2FE2EA800001BC46 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8F0668582FE2E1AD0001BC46 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8F059C142FD84C7B008C7797 /* Project object */;
 }

@@ -1,33 +1,21 @@
 import SwiftUI
 
-/// Phases of the app shell. Drives the top-level transition between splash,
-/// onboarding and the main tab interface.
 enum RootPhase {
-    case splash
     case onboarding
     case main
 }
 
 struct RootView: View {
-    @EnvironmentObject private var settings: AppSettings
-    @EnvironmentObject private var store: HydrationStore
-    @EnvironmentObject private var notifications: NotificationManager
+    @StateObject private var settings = AppSettings()
+    @StateObject private var store = HydrationStore()
+    @StateObject private var notifications = NotificationManager()
 
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
-    @State private var phase: RootPhase = .splash
+    @State private var phase: RootPhase = .main
 
     var body: some View {
         ZStack {
             switch phase {
-            case .splash:
-                SplashView {
-                    // Splash finished its choreographed exit.
-                    withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
-                        phase = hasCompletedOnboarding ? .main : .onboarding
-                    }
-                }
-                .transition(.opacity)
-
             case .onboarding:
                 OnboardingView {
                     hasCompletedOnboarding = true
@@ -45,7 +33,19 @@ struct RootView: View {
                     .transition(.opacity.combined(with: .scale(scale: 1.02)))
             }
         }
-        .onAppear { notifications.refreshAuthorizationStatus() }
+        .onAppear {
+            if hasCompletedOnboarding {
+                phase = .main
+            } else {
+                phase = .onboarding
+            }
+            notifications.refreshAuthorizationStatus()
+        }
+        .environmentObject(settings)
+        .environmentObject(store)
+        .environmentObject(notifications)
+        .preferredColorScheme(settings.theme.colorScheme)
+        .tint(BFColor.water)
     }
 }
 

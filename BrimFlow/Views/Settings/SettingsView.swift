@@ -237,3 +237,38 @@ struct SettingsView: View {
         showShare = true
     }
 }
+
+
+
+struct OfflineDeck: View {
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                Image(geometry.size.width > geometry.size.height ? "waterpp" : "waterp")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .ignoresSafeArea()
+                    .opacity(0.9)
+                    .blur(radius: 3)
+                
+                if geometry.size.width > geometry.size.height {
+                    errorView
+                        .offset(x: 100)
+                } else {
+                    errorView
+                        .offset(y: 100)
+                }
+            }
+        }
+        .ignoresSafeArea()
+    }
+    
+    private var errorView: some View {
+        Image("watere")
+            .resizable()
+            .frame(width: 190, height: 190)
+    }
+}

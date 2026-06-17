@@ -214,8 +214,6 @@ struct BubbleGlassView: View {
     }
 }
 
-// MARK: - Full-screen rising bubbles (splash / onboarding backdrop)
-
 struct RisingBubblesView: View {
     @Binding var isActive: Bool
     var count: Int = 26

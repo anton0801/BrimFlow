@@ -1,15 +1,7 @@
-//
-//  SplashView.swift
-//  BrimFlow
-//
-//  Thematic launch animation: a shifting aqua gradient, a continuous bubble
-//  stream, and a spring-entering "brim drop" logo with a designed implode exit.
-//  Driven by ONE coordinator timer; all loops reset in `.onDisappear`.
-//
-
 import SwiftUI
+import Combine
+import Network
 
-/// A simple water-droplet silhouette used for the logo.
 struct DropShape: Shape {
     func path(in rect: CGRect) -> Path {
         var p = Path()
@@ -33,8 +25,9 @@ struct DropShape: Shape {
 }
 
 struct SplashView: View {
-    let onFinished: () -> Void
 
+    @StateObject private var helm = BrimHelm()
+    
     // Animation layer state.
     @State private var bubblesActive = false
     @State private var bgShift = false
@@ -43,67 +36,124 @@ struct SplashView: View {
     @State private var logoOpacity: Double = 0
     @State private var textOpacity: Double = 0
     @State private var exiting = false
+    @State private var networkMonitor = NWPathMonitor()
 
     // Single coordinator timer.
     @State private var timer: Timer?
+    @State private var cancellables = Set<AnyCancellable>()
     @State private var elapsed: Double = 0
     @State private var didFinish = false
 
     var body: some View {
-        ZStack {
-            // Layer 1 — shifting aqua background gradient.
-            LinearGradient(colors: [Color(hex: "#E7F6FA"), Color(hex: "#D8EEF4"), Color(hex: "#22D3EE").opacity(0.35)],
-                           startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-                .hueRotation(.degrees(bgShift ? 12 : -6))
-                .overlay(
-                    RadialGradient(colors: [BFColor.waterSoft.opacity(0.35), .clear],
-                                   center: .center,
-                                   startRadius: 20,
-                                   endRadius: bgShift ? 360 : 240)
-                        .ignoresSafeArea()
-                        .blendMode(.screen)
-                )
-
-            // Layer 2 — continuous rising bubbles.
-            RisingBubblesView(isActive: $bubblesActive, count: 26, tint: BFColor.water)
-                .ignoresSafeArea()
-                .opacity(0.9)
-
-            // Layer 3 — logo + title.
-            VStack(spacing: 18) {
+        NavigationView {
+            GeometryReader { geo in
                 ZStack {
-                    DropShape()
-                        .fill(LinearGradient(colors: [BFColor.waterSoft, BFColor.waterActive],
-                                             startPoint: .top, endPoint: .bottom))
-                        .frame(width: 96, height: 116)
-                        .shadow(color: BFColor.aquaGlow, radius: 18, y: 8)
-                    Image(systemName: "drop.fill")
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.white.opacity(0.9))
-                        .offset(y: 6)
-                }
-                .scaleEffect(logoScale)
-                .opacity(logoOpacity)
+                    // Layer 1 — shifting aqua background gradient.
+                    LinearGradient(colors: [Color(hex: "#E7F6FA"), Color(hex: "#D8EEF4"), Color(hex: "#22D3EE").opacity(0.35)],
+                                   startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea()
+                        .hueRotation(.degrees(bgShift ? 12 : -6))
+                        .overlay(
+                            RadialGradient(colors: [BFColor.waterSoft.opacity(0.35), .clear],
+                                           center: .center,
+                                           startRadius: 20,
+                                           endRadius: bgShift ? 360 : 240)
+                                .ignoresSafeArea()
+                                .blendMode(.screen)
+                        )
+                    
+                    Color.black
+                        .opacity(0.75)
+                        .ignoresSafeArea()
+                    
+                    Image(geo.size.width > geo.size.height ? "waterll" : "waterl")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .ignoresSafeArea()
+                        .opacity(0.9)
+                        .blur(radius: 2)
+                    
+                    NavigationLink(
+                        destination: SpillwayView().navigationBarHidden(true),
+                        isActive: $helm.navigateToWeb
+                    ) { EmptyView() }
 
-                VStack(spacing: 6) {
-                    Text("Brim Flow")
-                        .font(BFFont.display(34))
-                        .foregroundColor(Color(hex: "#0E3A45"))
-                    Text("Stay full. Stay fresh.")
-                        .font(BFFont.headline(15))
-                        .foregroundColor(Color(hex: "#3E6B76"))
+                    RisingBubblesView(isActive: $bubblesActive, count: 26, tint: BFColor.water)
+                        .ignoresSafeArea()
+                        .opacity(0.9)
+
+                    VStack(spacing: 18) {
+                        ZStack {
+                            Image("splash_loading_icon")
+                                .resizable()
+                                .frame(width: 128, height: 128)
+                                .cornerRadius(128)
+                                .blur(radius: 10)
+                            RotatingGlow()
+                            Image("splash_loading_icon")
+                                .resizable()
+                                .frame(width: 124, height: 124)
+                                .cornerRadius(124)
+                        }
+                        .scaleEffect(logoScale)
+                        .opacity(logoOpacity)
+
+                        VStack(spacing: 6) {
+                            Text("Brim Flow")
+                                .font(BFFont.display(34))
+                                .foregroundColor(.white)
+                            Text("Load app content.")
+                                .font(BFFont.headline(15))
+                                .foregroundColor(.white.opacity(0.8))
+                        }
+                        .opacity(textOpacity)
+                    }
+                    .scaleEffect(exiting ? 8 : 1)
+                    .opacity(exiting ? 0 : 1)
+                    
+                    
+                    NavigationLink(
+                        destination: RootView().navigationBarBackButtonHidden(true),
+                        isActive: $helm.navigateToMain
+                    ) { EmptyView() }
                 }
-                .opacity(textOpacity)
+                .onAppear(perform: launch)
+                .onDisappear(perform: cleanup)
+                .fullScreenCover(isPresented: $helm.showPermissionPrompt) {
+                    ConsentDeck(helm: helm)
+                }
+                .fullScreenCover(isPresented: $helm.showOfflineView) {
+                    OfflineDeck()
+                }
             }
-            .scaleEffect(exiting ? 8 : 1)
-            .opacity(exiting ? 0 : 1)
+            .ignoresSafeArea()
         }
-        .onAppear(perform: start)
-        .onDisappear(perform: cleanup)
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+    
+    private func launch() {
+        wireStreams()
+        wireNetworkMonitoring()
+        helm.ignite()
+        start()
     }
 
-    // MARK: - Coordinator
+    private func wireStreams() {
+        NotificationCenter.default.publisher(for: .intakeArrived)
+            .compactMap { $0.userInfo?["conversionData"] as? [String: Any] }
+            .sink { data in
+                helm.ingestIntake(data)
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: .tributariesArrived)
+            .compactMap { $0.userInfo?["deeplinksData"] as? [String: Any] }
+            .sink { data in
+                helm.ingestTributaries(data)
+            }
+            .store(in: &cancellables)
+    }
 
     private func start() {
         bubblesActive = true
@@ -130,28 +180,53 @@ struct SplashView: View {
                 textOpacity = 1
             }
         }
-        // Phase 4 (2.5s): designed exit — logo scales up and fades out.
-        if elapsed >= 2.5 && !exiting {
-            withAnimation(.easeIn(duration: 0.55)) {
-                exiting = true
+    }
+    
+    private func wireNetworkMonitoring() {
+        networkMonitor.pathUpdateHandler = { path in
+            Task { @MainActor in
+                helm.networkConnectivityChanged(path.status == .satisfied)
             }
         }
-        // Finish shortly after the exit animation begins.
-        if elapsed >= 3.05 && !didFinish {
-            didFinish = true
-            timer?.invalidate()
-            timer = nil
-            onFinished()
-        }
+        networkMonitor.start(queue: .global(qos: .background))
     }
 
     private func cleanup() {
-        // Stop every looping animation so nothing runs in the background.
         timer?.invalidate()
         timer = nil
         bubblesActive = false
         withAnimation(.linear(duration: 0)) {
             bgShift = false
         }
+    }
+}
+
+struct RotatingGlow: View {
+    @State private var rotation: Double = 0
+    @State private var isAnimating = false
+
+    var body: some View {
+        Circle()
+            .trim(from: 0, to: 0.25)
+            .stroke(
+                AngularGradient(
+                    colors: [.white.opacity(0.9), .white],
+                    center: .center
+                ),
+                style: StrokeStyle(lineWidth: 6, lineCap: .round)
+            )
+            .frame(width: 132, height: 132)
+            .rotationEffect(.degrees(rotation))
+            .blur(radius: 4)
+            .onAppear {
+                isAnimating = true
+                withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                    rotation = 360
+                }
+            }
+            .onDisappear {
+                isAnimating = false
+                rotation = 0
+            }
     }
 }
