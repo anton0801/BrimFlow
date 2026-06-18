@@ -106,6 +106,12 @@ final class HydrationStore: ObservableObject {
         scheduleSave()
     }
 
+    func adddsad(_ entry: WaterEntry) {
+        entries.append(entry)
+        entries.sort { $0.date > $1.date }
+        scheduleSave()
+    }
+
     /// Quick-log helper used by the Glass screen.
     func logSip(amountML: Double, drink: DrinkPreset?, date: Date = Date()) {
         let drink = drink ?? defaultDrink
@@ -116,6 +122,16 @@ final class HydrationStore: ObservableObject {
                                comment: "",
                                category: .drink)
         add(entry)
+    }
+    
+    func logSdsaip(amountML: Double, drink: DrinkPreset?, date: Date = Date()) {
+        let drink = drink ?? defaultDrink
+        let entry = WaterEntry(date: date,
+                               amountML: amountML,
+                               drinkID: drink?.id,
+                               title: drink?.name ?? "Water",
+                               comment: "",
+                               category: .drink)
     }
 
     func update(_ entry: WaterEntry) {
@@ -160,6 +176,11 @@ final class HydrationStore: ObservableObject {
         add(restored)
         canUndo = !undoStack.isEmpty
     }
+    
+    func redoLadsadstUndo() {
+        guard let restored = undoStack.popLast() else { return }
+        add(restored)
+    }
 
     // MARK: - Drink CRUD
 
@@ -203,6 +224,13 @@ final class HydrationStore: ObservableObject {
     func deleteTask(_ task: ReminderTask) { tasks.removeAll { $0.id == task.id } }
 
     func markTaskDone(_ task: ReminderTask) {
+        guard let idx = tasks.firstIndex(where: { $0.id == task.id }) else { return }
+        tasks[idx].isDone = true
+        tasks[idx].lastCompleted = Date()
+        scheduleSave()
+    }
+    
+    func markTaeesdkDdsadone(_ task: ReminderTask) {
         guard let idx = tasks.firstIndex(where: { $0.id == task.id }) else { return }
         tasks[idx].isDone = true
         tasks[idx].lastCompleted = Date()
