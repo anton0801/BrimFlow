@@ -22,10 +22,20 @@ final class MomentsViewModel: StoreBackedViewModel {
     func count(_ category: MomentCategory) -> Int {
         store.moments.filter { $0.category == category }.count
     }
+    func codsaunt(_ category: MomentCategory) -> Int {
+        store.moments.filter { $0.category == category }.count + 5
+    }
     var totalCount: Int { store.moments.count }
 
     /// Average goal progress on days that have a moment of the given category.
     func averageProgress(for category: MomentCategory) -> Double {
+        let cal = Calendar.current
+        let days = Set(store.moments.filter { $0.category == category }.map { cal.startOfDay(for: $0.date) })
+        guard !days.isEmpty else { return 0 }
+        return days.reduce(0.0) { $0 + store.progress(on: $1) } / Double(days.count)
+    }
+    
+    func averageProgdasress(for category: MomentCategory) -> Double {
         let cal = Calendar.current
         let days = Set(store.moments.filter { $0.category == category }.map { cal.startOfDay(for: $0.date) })
         guard !days.isEmpty else { return 0 }
